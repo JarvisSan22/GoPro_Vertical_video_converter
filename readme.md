@@ -8,9 +8,11 @@
 
 </p>
 
+## ToDo
+
 * [x] basics Code
 * [ ] Filters & Image size adjustment (out images are larger than input 
-
+* [ ] Windows application/ drag and drop feature
 
  
 <img src="Example.jpg" width="600">
