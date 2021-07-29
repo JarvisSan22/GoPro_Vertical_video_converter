@@ -11,7 +11,7 @@
 ## ToDo
 
 * [x] basics Code
-* [ ] Filters & Image size adjustment (out images are larger than input 
+* [x] Image size adjustment
 * [ ] Windows application/ drag and drop feature
 
  
