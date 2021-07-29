@@ -5,7 +5,9 @@ import sys
 import glob
 import time
 
-
+#9:16（720 × 1,280px 以上）
+newh=1280
+neww=720
 
 def frameRotation(frame,angle:float,w:int,h:int):
     a=np.radians(angle)
@@ -24,10 +26,11 @@ def frameRotation(frame,angle:float,w:int,h:int):
     return frame
 
 
-def captureAndRecordSetup(file):
+def captureAndRecordSetup(file,convert_filetype=None):
     cap= cv2.VideoCapture(file)
     filename=file.split(".")[0] # .{}の部分を削除
     filetype=file.split(".")[1]
+
     view=False
 
     #総フレーム数を取得
@@ -35,15 +38,19 @@ def captureAndRecordSetup(file):
     #フレームレート
     frame_rate=int(cap.get(cv2.CAP_PROP_FPS))
     #保存先
-    fourcc = cv2.VideoWriter_fourcc('M','J','P','G') #保存形式
+    fourcc = cv2.VideoWriter_fourcc('m','p','4', 'v')#('M','J','P','G') #保存形式
     w=int(cap.get(3)) #幅
     h=int(cap.get(4)) #高さ
-    out = cv2.VideoWriter(f'{filename}_rot.{filetype}',fourcc,frame_rate, (h,w))
+    if convert_filetype:
+        filetype=convert_filetype
+
+    out = cv2.VideoWriter(f'{filename}_rot.{filetype}',fourcc,frame_rate, (neww,newh))
     return cap,out,filename,filetype,frame_count,frame_rate,w,h
 
 def processVideo(cap,out,w,h,view):
     while True:
         ret,frame=cap.read()
+        #print(frame.shape)
         if not ret:
             break
 
@@ -51,13 +58,14 @@ def processVideo(cap,out,w,h,view):
         #angle 90
         angle=-90
         frame=frameRotation(frame,angle,w,h)
+        frame=cv2.resize(frame,(neww,newh),interpolation=cv2.INTER_LINEAR)
 
         #保存
         out.write(frame)
         #表示
         if view:
             cv2.namedWindow("res", cv2.WINDOW_NORMAL)
-            cv2.imshow('Frame', cv2.resize(frame,(h,w)))    #(h//5,w//5)))
+            cv2.imshow('Frame', cv2.resize(frame,(w//5,h//5)))    #(h//5,w//5)))
             cv2.waitKey(1)
 
     out.release()
@@ -76,13 +84,14 @@ def main(view):
     for file in files:
         print(f"{'='*10}")
         print(file)
+        
         start = time.time()
-        cap,out, _ , _ , _ , _ ,w,h=captureAndRecordSetup(file)
+        cap,out, _ , _ , _ , _ ,w,h=captureAndRecordSetup(file,"mp4")
         processVideo(cap,out,w,h,view)
         elapses= time.time() - start 
         print(file, " rotated ", elapses)
     
 
 if __name__=="__main__":
-    view=False
+    view=True
     main(view)
